@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Surmesur B Corp Action Matrix</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f5f5f5;
+      color: #333;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+      color: white;
+      padding: 2rem 1.5rem;
+      border-bottom: 3px solid #d4af37;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: 600;
+      letter-spacing: 3px;
+    }
+
+    .lang-toggle {
+      display: flex;
+      gap: 8px;
+    }
+
+    .lang-btn {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.4);
+      color: white;
+      padding: 8px 14px;
+      font-size: 12px;
+      cursor: pointer;
+      border-radius: 4px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .lang-btn:hover {
+      border-color: #d4af37;
+    }
+
+    .lang-btn.active {
+      background: #d4af37;
+      color: #1a1a1a;
+      border-color: #d4af37;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .section {
+      background: white;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      color: #1a1a1a;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 12px;
+      margin-bottom: 1rem;
+    }
+
+    .form-row.full {
+      grid-template-columns: 1fr;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 6px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    input[type="text"],
+    select {
+      width: 100%;
+      padding: 10px 12px;
+      font-size: 14px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-family: inherit;
+    }
+
+    input[type="text"]:focus,
+    select:focus {
+      outline: none;
+      border-color: #d4af37;
+      box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.1);
+    }
+
+    .impact-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 1.5rem 0;
+    }
+
+    .impact-card {
+      background: #f9f9f9;
+      border: 1px solid #e8e8e8;
+      border-radius: 6px;
+      padding: 12px;
+    }
+
+    .impact-card label {
+      font-size: 11px;
+    }
+
+    .impact-card input[type="range"] {
+      width: 100%;
+      margin: 8px 0;
+      cursor: pointer;
+    }
+
+    .impact-value {
+      font-size: 18px;
+      font-weight: 600;
+      color: #d4af37;
+      text-align: center;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 8px;
+      margin-top: 1.5rem;
+    }
+
+    button {
+      padding: 10px 16px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background: white;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    button:hover {
+      background: #f0f0f0;
+      border-color: #999;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    .btn-add {
+      color: #558b2f;
+      border-color: #7cb342;
+    }
+
+    .btn-add:hover {
+      background: #f1f8e9;
+    }
+
+    .btn-export {
+      color: #01579b;
+      border-color: #1976d2;
+    }
+
+    .btn-export:hover {
+      background: #e3f2fd;
+    }
+
+    .btn-del {
+      color: #c62828;
+      padding: 4px 8px;
+      border: none;
+      font-size: 16px;
+      background: transparent;
+    }
+
+    .matrix-container {
+      position: relative;
+      width: 100%;
+      height: 500px;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+    }
+
+    .quadrant {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 500;
+      color: rgba(0,0,0,0.15);
+    }
+
+    .q1 { top: 0; left: 50%; width: 50%; height: 50%; background: rgba(124, 179, 66, 0.08); }
+    .q2 { top: 0; left: 0; width: 50%; height: 50%; background: rgba(25, 118, 210, 0.08); }
+    .q3 { top: 50%; left: 0; width: 50%; height: 50%; background: rgba(66, 66, 66, 0.05); }
+    .q4 { top: 50%; left: 50%; width: 50%; height: 50%; background: rgba(230, 81, 0, 0.08); }
+
+    .axis {
+      position: absolute;
+      background: #ddd;
+    }
+
+    .axis-x {
+      width: 100%;
+      height: 1px;
+      top: 50%;
+    }
+
+    .axis-y {
+      width: 1px;
+      height: 100%;
+      left: 50%;
+    }
+
+    .axis-label {
+      position: absolute;
+      font-size: 11px;
+      font-weight: 600;
+      color: #999;
+    }
+
+    .label-bottom {
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .label-left {
+      left: 8px;
+      top: 50%;
+      transform: translateY(-50%) rotate(-90deg);
+      transform-origin: left center;
+    }
+
+    .bubbles {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+    }
+
+    .bubble {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      cursor: pointer;
+    }
+
+    .bubble-dot {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      border: 2px solid;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: white;
+      transition: all 0.2s ease;
+    }
+
+    .bubble:hover .bubble-dot {
+      transform: scale(1.15);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .bubble-q1 .bubble-dot {
+      background: #558b2f;
+      border-color: #33691e;
+    }
+
+    .bubble-q2 .bubble-dot {
+      background: #01579b;
+      border-color: #0d47a1;
+    }
+
+    .bubble-q3 .bubble-dot {
+      background: #616161;
+      border-color: #212121;
+    }
+
+    .bubble-q4 .bubble-dot {
+      background: #e65100;
+      border-color: #bf360c;
+    }
+
+    .bubble-label {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 8px 12px;
+      font-size: 12px;
+      white-space: nowrap;
+      margin-bottom: 8px;
+      opacity: 0;
+      pointer-events: none;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      transition: opacity 0.2s ease;
+    }
+
+    .bubble:hover .bubble-label {
+      opacity: 1;
+    }
+
+    .legend {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      margin-top: 1rem;
+      padding: 1rem;
+      background: #f9f9f9;
+      border: 1px solid #e8e8e8;
+      border-radius: 6px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 12px;
+    }
+
+    .legend-box {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .legend-title {
+      font-weight: 600;
+      color: #333;
+    }
+
+    .legend-desc {
+      font-size: 11px;
+      color: #999;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th {
+      text-align: left;
+      padding: 12px;
+      border-bottom: 1px solid #ddd;
+      font-weight: 600;
+      color: #666;
+      background: #f9f9f9;
+    }
+
+    td {
+      padding: 12px;
+      border-bottom: 1px solid #e8e8e8;
+    }
+
+    tr:hover {
+      background: #f9f9f9;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .badge-q1 {
+      background: rgba(124, 179, 66, 0.15);
+      color: #558b2f;
+    }
+
+    .badge-q2 {
+      background: rgba(25, 118, 210, 0.15);
+      color: #01579b;
+    }
+
+    .badge-q3 {
+      background: rgba(66, 66, 66, 0.1);
+      color: #424242;
+    }
+
+    .badge-q4 {
+      background: rgba(230, 81, 0, 0.15);
+      color: #e65100;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 2rem;
+      color: #999;
+      font-size: 14px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .header {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .container {
+        padding: 1rem;
+      }
+
+      .section {
+        padding: 1.5rem;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+
+      .impact-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .legend {
+        grid-template-columns: 1fr;
+      }
+
+      .matrix-container {
+        height: 400px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">SURMESUR</div>
+    <div class="lang-toggle">
+      <button class="lang-btn active" onclick="setLang('fr')">Français</button>
+      <button class="lang-btn" onclick="setLang('en')">English</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="section">
+      <div class="section-title">
+        <span class="fr">Ajouter une action</span>
+        <span class="en hidden">Add an action</span>
+      </div>
+
+      <div class="form-row full">
+        <div>
+          <label class="fr">Action / Gap</label>
+          <label class="en hidden">Action / Gap</label>
+          <input type="text" id="actionName" placeholder="Create traceability register...">
+        </div>
+      </div>
+
+      <div style="margin: 1rem 0;">
+        <label style="font-weight: 600; text-transform: uppercase;">
+          <span class="fr">Score d'impact (0-3 pts)</span>
+          <span class="en hidden">Impact score (0-3 pts)</span>
+        </label>
+        <div class="impact-grid">
+          <div class="impact-card">
+            <label class="fr">Standard B Corp</label>
+            <label class="en hidden">B Corp Standard</label>
+            <input type="range" min="0" max="1" value="0" class="impact-slider">
+            <div class="impact-value">0</div>
+          </div>
+          <div class="impact-card">
+            <label class="fr">Workers & People</label>
+            <label class="en hidden">Workers & People</label>
+            <input type="range" min="0" max="1" value="0" class="impact-slider">
+            <div class="impact-value">0</div>
+          </div>
+          <div class="impact-card">
+            <label class="fr">Pertinence métier</label>
+            <label class="en hidden">Business relevance</label>
+            <input type="range" min="0" max="1" value="0" class="impact-slider">
+            <div class="impact-value">0</div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <label style="font-weight: 600; text-transform: uppercase;">
+          <span class="fr">Score d'effort</span>
+          <span class="en hidden">Effort score</span>
+        </label>
+        <select id="effortLevel">
+          <option value="1">Quick Fix (≤1 week, 1 person)</option>
+          <option value="2">Moderate (2-4 weeks, B Team)</option>
+          <option value="3">Complex (1-3 months, multiple teams)</option>
+          <option value="4">Transformational (3+ months, process reinvention)</option>
+        </select>
+      </div>
+
+      <div class="button-group">
+        <button class="btn-add" onclick="addAction()">+ <span class="fr">Ajouter</span><span class="en hidden">Add</span></button>
+        <button class="btn-export" onclick="exportRoadmap()">📥 <span class="fr">Exporter roadmap</span><span class="en hidden">Export roadmap</span></button>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">
+        <span class="fr">Matrice Impact-Effort</span>
+        <span class="en hidden">Impact-Effort Matrix</span>
+      </div>
+
+      <div class="matrix-container">
+        <div class="quadrant q1"></div>
+        <div class="quadrant q2"></div>
+        <div class="quadrant q3"></div>
+        <div class="quadrant q4"></div>
+        <div class="axis axis-x"></div>
+        <div class="axis axis-y"></div>
+        <div class="axis-label label-bottom">
+          <span class="fr">Effort →</span>
+          <span class="en hidden">Effort →</span>
+        </div>
+        <div class="axis-label label-left">
+          <span class="fr">Impact</span>
+          <span class="en hidden">Impact</span>
+        </div>
+        <div class="bubbles" id="bubblesContainer"></div>
+      </div>
+
+      <div class="legend">
+        <div class="legend-item">
+          <div class="legend-box" style="background: #558b2f;"></div>
+          <div>
+            <div class="legend-title"><span class="fr">Quick Wins</span><span class="en hidden">Quick Wins</span></div>
+            <div class="legend-desc"><span class="fr">Faible effort, Impact fort</span><span class="en hidden">Low effort, High impact</span></div>
+          </div>
+        </div>
+        <div class="legend-item">
+          <div class="legend-box" style="background: #01579b;"></div>
+          <div>
+            <div class="legend-title"><span class="fr">Major Projects</span><span class="en hidden">Major Projects</span></div>
+            <div class="legend-desc"><span class="fr">Effort fort, Impact fort</span><span class="en hidden">High effort, High impact</span></div>
+          </div>
+        </div>
+        <div class="legend-item">
+          <div class="legend-box" style="background: #616161;"></div>
+          <div>
+            <div class="legend-title"><span class="fr">Fill-Ins</span><span class="en hidden">Fill-Ins</span></div>
+            <div class="legend-desc"><span class="fr">Faible effort, Impact faible</span><span class="en hidden">Low effort, Low impact</span></div>
+          </div>
+        </div>
+        <div class="legend-item">
+          <div class="legend-box" style="background: #e65100;"></div>
+          <div>
+            <div class="legend-title"><span class="fr">Time Sinks</span><span class="en hidden">Time Sinks</span></div>
+            <div class="legend-desc"><span class="fr">Effort fort, Impact faible</span><span class="en hidden">High effort, Low impact</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">
+        <span class="fr">Actions en cours</span>
+        <span class="en hidden">Current actions</span>
+      </div>
+
+      <table id="actionsTable">
+        <thead>
+          <tr>
+            <th class="fr">Action</th>
+            <th class="en hidden">Action</th>
+            <th class="fr">Impact</th>
+            <th class="en hidden">Impact</th>
+            <th class="fr">Effort</th>
+            <th class="en hidden">Effort</th>
+            <th class="fr">Quadrant</th>
+            <th class="en hidden">Quadrant</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="actionsBody">
+          <tr><td colspan="5" class="empty-state">
+            <span class="fr">Aucune action pour le moment</span>
+            <span class="en hidden">No actions yet</span>
+          </td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    let lang = 'fr';
+    let actions = [];
+
+    const effortLabels = {
+      1: { fr: 'Quick Fix', en: 'Quick Fix' },
+      2: { fr: 'Modéré', en: 'Moderate' },
+      3: { fr: 'Complexe', en: 'Complex' },
+      4: { fr: 'Structurant', en: 'Transformational' }
+    };
+
+    const quadrantLabels = {
+      q1: { fr: 'Quick Wins', en: 'Quick Wins' },
+      q2: { fr: 'Major Projects', en: 'Major Projects' },
+      q3: { fr: 'Fill-Ins', en: 'Fill-Ins' },
+      q4: { fr: 'Time Sinks', en: 'Time Sinks' }
+    };
+
+    function setLang(l) {
+      lang = l;
+      document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+      
+      document.querySelectorAll('.fr').forEach(el => el.classList.toggle('hidden', l !== 'fr'));
+      document.querySelectorAll('.en').forEach(el => el.classList.toggle('hidden', l !== 'en'));
+    }
+
+    function addAction() {
+      const name = document.getElementById('actionName').value.trim();
+      const sliders = document.querySelectorAll('.impact-slider');
+      const impact = Array.from(sliders).reduce((sum, s) => sum + parseInt(s.value), 0);
+      const effort = parseInt(document.getElementById('effortLevel').value);
+      
+      if (!name) {
+        alert(lang === 'fr' ? 'Entrez une action' : 'Enter an action');
+        return;
+      }
+      
+      actions.push({ id: Date.now(), name, impact, effort });
+      
+      document.getElementById('actionName').value = '';
+      document.querySelectorAll('.impact-slider').forEach(s => s.value = 0);
+      document.querySelectorAll('.impact-value').forEach(v => v.textContent = '0');
+      document.getElementById('effortLevel').value = '1';
+      
+      render();
+    }
+
+    function deleteAction(id) {
+      actions = actions.filter(a => a.id !== id);
+      render();
+    }
+
+    function getQuadrant(impact, effort) {
+      if (impact >= 2 && effort <= 2) return 'q1';
+      if (impact >= 2 && effort > 2) return 'q2';
+      if (impact < 2 && effort <= 2) return 'q3';
+      return 'q4';
+    }
+
+    function render() {
+      const container = document.getElementById('bubblesContainer');
+      container.innerHTML = '';
+      
+      actions.forEach(action => {
+        const impactNorm = (action.impact / 3) * 100;
+        const effortNorm = ((action.effort - 1) / 3) * 100;
+        const quad = getQuadrant(action.impact, action.effort);
+        
+        const bubble = document.createElement('div');
+        bubble.className = `bubble bubble-${quad}`;
+        bubble.style.left = effortNorm + '%';
+        bubble.style.top = (100 - impactNorm) + '%';
+        
+        bubble.innerHTML = `
+          <div class="bubble-dot">${action.impact}</div>
+          <div class="bubble-label">${action.name}</div>
+        `;
+        
+        container.appendChild(bubble);
+      });
+      
+      const tbody = document.getElementById('actionsBody');
+      if (actions.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="empty-state">
+          <span class="fr">Aucune action pour le moment</span>
+          <span class="en hidden">No actions yet</span>
+        </td></tr>`;
+      } else {
+        tbody.innerHTML = actions.map(a => {
+          const quad = getQuadrant(a.impact, a.effort);
+          return `
+            <tr>
+              <td><strong>${a.name}</strong></td>
+              <td>${a.impact}/3</td>
+              <td>${effortLabels[a.effort][lang]}</td>
+              <td><span class="badge badge-${quad}">${quadrantLabels[quad][lang]}</span></td>
+              <td><button class="btn-del" onclick="deleteAction(${a.id})">×</button></td>
+            </tr>
+          `;
+        }).join('');
+      }
+    }
+
+    function exportRoadmap() {
+      const frContent = generateRoadmap('fr');
+      const enContent = generateRoadmap('en');
+      
+      const combined = `${frContent}\n\n---\n\n${enContent}`;
+      
+      const blob = new Blob([combined], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'Surmesur_B_Corp_Roadmap.txt';
+      a.click();
+    }
+
+    function generateRoadmap(l) {
+      const title = l === 'fr' ? 'Roadmap B Corp — Surmesur' : 'B Corp Roadmap — Surmesur';
+      const byQuadrant = l === 'fr' ? 'Par quadrant:' : 'By quadrant:';
+      
+      const grouped = {
+        q1: actions.filter(a => getQuadrant(a.impact, a.effort) === 'q1'),
+        q2: actions.filter(a => getQuadrant(a.impact, a.effort) === 'q2'),
+        q3: actions.filter(a => getQuadrant(a.impact, a.effort) === 'q3'),
+        q4: actions.filter(a => getQuadrant(a.impact, a.effort) === 'q4')
+      };
+      
+      let output = `${title}\n${'='.repeat(40)}\n\n${byQuadrant}\n\n`;
+      
+      Object.keys(grouped).forEach(q => {
+        output += `${quadrantLabels[q][l]}\n${'-'.repeat(30)}\n`;
+        grouped[q].forEach(a => {
+          output += `• ${a.name} (Impact: ${a.impact}/3, Effort: ${effortLabels[a.effort][l]})\n`;
+        });
+        output += '\n';
+      });
+      
+      return output;
+    }
+
+    document.querySelectorAll('.impact-slider').forEach((slider, idx) => {
+      slider.addEventListener('input', e => {
+        const cards = document.querySelectorAll('.impact-card');
+        cards[idx].querySelector('.impact-value').textContent = e.target.value;
+      });
+    });
+
+    // Allow Enter key to add action
+    document.getElementById('actionName').addEventListener('keypress', e => {
+      if (e.key === 'Enter') addAction();
+    });
+
+    render();
+  </script>
+</body>
+</html>
